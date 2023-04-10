@@ -5,15 +5,50 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  FlatList
 } from "react-native";
 
 import { FontAwesome } from "@expo/vector-icons";
 
+//importando aquitvo Tarefa.js
+import Tarefa from "./src/Tarefa";
+
 export default function App() {
   const [tarefa, setTarefa] = useState('')
 
+  //armazenar lista de tarefas
+  const [lista, setLista] = useState([
+   
+  ])
+
   function handleButtonAdd(){
-    alert(tarefa)
+    //verifica se a tarefa foi inserida vazia
+    if(tarefa === ''){
+      return alert("Digite algo antes de inserir uma tarefa!");
+    }
+
+    //os dados que serão inseridos
+    const dados = {
+      key: Date.now(),
+      item: tarefa
+    }
+
+    //old array pega os itens que ja tenho e tb insere os itens que eu quero passar que no caso é a const dados
+    setLista(oldArray => [dados, ...oldArray])
+
+    //zerando input após ter add o item
+    setTarefa('')
+
+  }
+
+  function handleButtonDelete(item){
+    console.log(item)
+
+    let filtroItem = lista.filter((tarefa) => {
+      return(tarefa.item !== item)
+    })
+
+    setLista(filtroItem)
   }
 
   return (
@@ -25,7 +60,7 @@ export default function App() {
           <TextInput placeholder="Digite sua tarefa..." 
           style={styles.input}
           value={tarefa} //recebendo a useState tarefa para armazenar uma tarefa
-          onChangeText={(tarefa) => setTarefa(tarefa)} //setando a tarefa armazenada
+          onChangeText={(text) => setTarefa(text)} //setando a tarefa armazenada
           
           />
 
@@ -33,6 +68,14 @@ export default function App() {
             <FontAwesome name="plus" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
+
+        <FlatList
+         data={lista}
+         keyExtractor={(item) => item.key}
+         renderItem={ ({ item }) => <Tarefa data={item} deleteItem={ () => handleButtonDelete(item.item) } /> }
+         style={styles.lista}
+        />
+
       </View>
     </>
   );
@@ -75,5 +118,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
+  },
+  lista: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingStart: '4%',
+    paddingEnd: '4%',  
   },
 });
